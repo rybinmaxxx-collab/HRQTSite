@@ -1,4 +1,5 @@
 import { Button, Container, ContourMark } from "@/components/ui";
+import { typo } from "@/lib/typo";
 import { hero, marquee } from "@/content/site";
 
 /**
@@ -21,13 +22,13 @@ export function Hero() {
       <Container className="relative pt-16 pb-12">
         <div className="flex flex-col items-center px-0 xl:px-26">
           <h1 className="mb-6 text-center font-display text-[2.5rem] leading-[1] font-bold tracking-[-1.28px] text-balance lg:text-[4.25rem] lg:tracking-[-3px] xl:leading-[4.5rem]">
-            {hero.titleLead}
-            <strong>{hero.titleAccent}</strong>
-            {hero.titleTail}
+            {typo(hero.titleLead)}
+            <strong>{typo(hero.titleAccent)}</strong>
+            {typo(hero.titleTail)}
           </h1>
 
           <p className="mb-8 max-w-[800px] text-center text-[1.1875rem] leading-[32px] font-normal tracking-[-0.189px] text-ink-2">
-            {hero.lead}
+            {typo(hero.lead)}
           </p>
 
           <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:gap-6">

@@ -1,13 +1,18 @@
 import Link from "next/link";
 import {
   Button,
-  ContourMark,
   Eyebrow,
   HeadingRow,
   Section,
   SectionTitle,
 } from "@/components/ui";
+import { FileCheck, Layers, ShieldCheck } from "lucide-react";
+import { ServiceArt } from "@/components/ServiceArt";
+import { typo } from "@/lib/typo";
 import { audiences, faq, process, proof, security, statement } from "@/content/site";
+
+/** Иконки блока безопасности — по порядку пунктов в content/site.ts. */
+const SECURITY_ICONS = [ShieldCheck, Layers, FileCheck] as const;
 
 /**
  * Section 5 of the reference: the tint band.
@@ -26,11 +31,6 @@ export function Statement() {
   return (
     <Section tone="soft">
       <figure className="relative mx-auto flex w-full max-w-[900px] flex-col justify-center gap-8">
-        <div className="flex min-h-14 w-fit items-center gap-3 rounded-full border border-line px-6 py-2 xl:mx-auto">
-          <ContourMark size={28} />
-          <span className="font-display text-base font-bold tracking-[-0.02em]">HRQT</span>
-        </div>
-
         <blockquote className="quote-text grow text-left xl:text-center">
           <p className="mb-6 text-base leading-7 font-light tracking-[-0.5px] md:text-[1.375rem] md:tracking-[-1px]">
             {statement.leadIn}
@@ -42,11 +42,13 @@ export function Statement() {
         </blockquote>
 
         <figcaption className="flex flex-row leading-8 font-medium xl:justify-center">
+          {/* Место под фотографию основателя. Заменить на <Image> — круг и
+              размер уже заданы, менять больше ничего не нужно. */}
           <span
             aria-hidden
-            className="mr-4 flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-surface"
+            className="mr-4 flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent-soft text-lg font-bold text-accent-strong"
           >
-            <ContourMark size={32} />
+            КЭ
           </span>
           <div>
             <span className="block text-base leading-[26px] font-medium tracking-[-0.19px] xl:text-xl xl:leading-8">
@@ -85,8 +87,8 @@ export function Audiences() {
           <article key={item.title} className="group relative flex flex-col">
             <div className="mb-6 w-full overflow-hidden rounded-[var(--radius-card)] bg-soft">
               <div className="relative h-0 w-full pb-[55%]">
-                <div className="absolute inset-0 flex items-center justify-center transition-transform duration-200 ease-in-out group-hover:scale-110 group-hover:delay-[var(--animation-delay-base)]">
-                  <ContourMark size={56} />
+                <div className="absolute inset-0 transition-transform duration-200 ease-in-out group-hover:scale-[1.06] group-hover:delay-[var(--animation-delay-base)]">
+                  <ServiceArt name={item.art} />
                 </div>
               </div>
             </div>
@@ -137,7 +139,7 @@ export function Proof() {
         <SectionTitle lead={proof.title} className="max-w-[76rem]" />
       </HeadingRow>
       <p className="mt-6 mb-12 text-base leading-[1.68] tracking-[-0.01em] text-ink-2 md:text-xl">
-        {proof.lead}
+        {typo(proof.lead)}
       </p>
       <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2">
         {proof.cards.map((card) => (
@@ -145,12 +147,9 @@ export function Proof() {
             key={card.title}
             className="flex flex-col rounded-[var(--radius-card)] bg-accent-soft p-8 md:p-12"
           >
-            <div className="mb-6 flex min-h-14 w-fit items-center gap-3 rounded-full border border-line px-6 py-2">
-              <ContourMark size={28} />
-              <span className="text-[0.8125rem] font-semibold tracking-[0.08em] text-muted uppercase">
-                {card.meta}
-              </span>
-            </div>
+            <span className="mb-6 w-fit rounded-full bg-surface px-4 py-2 text-[0.8125rem] font-semibold tracking-[0.08em] text-accent-strong uppercase">
+              {card.meta}
+            </span>
             <h3 className="mb-4 font-display text-[1.375rem] leading-[1.25] font-bold tracking-[-0.033em]">
               {card.title}
             </h3>
@@ -174,22 +173,25 @@ export function Security() {
     <Section id="security" tone="ink">
       <Eyebrow onInk>{security.eyebrow}</Eyebrow>
       <h2 className="max-w-[50rem] font-display text-[2rem] leading-[2.25rem] font-bold tracking-[-1px] text-white md:text-[3.25rem] md:leading-[3.5rem] md:tracking-[-2px]">
-        {security.titleLead}
-        <strong>{security.titleAccent}</strong>
+        {typo(security.titleLead)}
+        <strong>{typo(security.titleAccent)}</strong>
       </h2>
       <p className="mt-6 mb-12 max-w-[46rem] text-xl leading-[1.68] tracking-[-0.01em] text-on-ink">
-        {security.lead}
+        {typo(security.lead)}
       </p>
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
-        {security.items.map((item) => (
+        {security.items.map((item, i) => {
+          const Icon = SECURITY_ICONS[i] ?? ShieldCheck;
+          return (
           <div key={item.title} className="flex flex-col gap-3">
-            <ContourMark size={40} onInk />
+            <Icon size={40} strokeWidth={1.6} className="text-accent-soft" aria-hidden />
             <h3 className="mt-2 font-display text-lg font-bold tracking-[-0.02em] text-white">
               {item.title}
             </h3>
             <p className="text-base leading-[1.625] text-on-ink">{item.body}</p>
           </div>
-        ))}
+          );
+        })}
       </div>
     </Section>
   );
@@ -240,7 +242,7 @@ export function Faq() {
             className="group rounded-[var(--radius-card)] border border-line bg-surface px-6 py-5 transition-colors duration-300 ease-in-out open:border-accent hover:border-accent"
           >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-display text-lg font-bold tracking-[-0.02em] [&::-webkit-details-marker]:hidden">
-              {item.q}
+              {typo(item.q)}
               <span
                 aria-hidden
                 className="shrink-0 text-2xl leading-none font-normal text-accent transition-transform duration-300 ease-in-out group-open:rotate-45"
@@ -249,7 +251,7 @@ export function Faq() {
               </span>
             </summary>
             <p className="mt-4 text-base leading-[1.625] tracking-[-0.01em] text-ink-2">
-              {item.a}
+              {typo(item.a)}
             </p>
           </details>
         ))}

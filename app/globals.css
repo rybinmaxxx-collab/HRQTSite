@@ -172,7 +172,34 @@ h3 > strong,
   opacity: 1;
 }
 
+/*
+ * Появление блока при скролле. Состоянием управляет components/Reveal.tsx.
+ * Движение намеренно маленькое: композиция снята с сайта, который при скролле
+ * не анимирует ничего, и крупный эффект спорил бы с его характером.
+ */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.reveal[data-shown="true"] {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal[data-shown="false"] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
   .animate-marquee {
     animation: none;
   }
@@ -187,6 +214,14 @@ h3 > strong,
 
 html {
   scroll-behavior: smooth;
+}
+
+/*
+ * Шапка фиксированная, поэтому переход по якорю из меню приводит блок ровно
+ * под неё. Отступ прокрутки поднимает цель на высоту шапки плюс воздух.
+ */
+[id] {
+  scroll-margin-top: calc(var(--h-nav) + 1.5rem);
 }
 
 body {

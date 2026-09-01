@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { typo } from "@/lib/typo";
 
 /**
  * The primitives, all lifted from Beamery's served markup and re-coloured
@@ -100,9 +101,9 @@ export function SectionTitle({
     <h2
       className={`font-display text-[2rem] leading-[2.25rem] font-bold tracking-[-1px] md:text-[3.25rem] md:leading-[3.5rem] md:tracking-[-2px] ${className}`}
     >
-      {lead}
-      {accent ? <strong>{accent}</strong> : null}
-      {tail}
+      {typo(lead)}
+      {accent ? <strong>{typo(accent)}</strong> : null}
+      {tail ? typo(tail) : null}
     </h2>
   );
 }

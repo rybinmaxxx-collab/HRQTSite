@@ -1,53 +1,63 @@
 import { Footer } from "@/components/Footer";
 import { Hero, Marquee } from "@/components/Hero";
 import { PackageCarousel } from "@/components/PackageCarousel";
-import { PlatformTabs } from "@/components/PlatformTabs";
-import {
-  Audiences,
-  Faq,
-  Process,
-  Proof,
-  Security,
-  Statement,
-} from "@/components/sections";
+import { Projects } from "@/components/Projects";
+import { Reveal } from "@/components/Reveal";
+import { Services } from "@/components/Services";
+import { Team } from "@/components/Team";
+import { Audiences, Faq, Process, Proof, Security, Statement } from "@/components/sections";
 
 /**
  * Главная.
  *
- * Порядок и геометрия блоков — с beamery.com, секция в секцию
- * (SECTION_MAP.md, репозиторий aura). Контент — HRQT.
+ * Композиция снята с beamery.com посекционно (SECTION_MAP.md, репозиторий
+ * aura), контент — HRQT. По ТЗ добавлены разделы команды и проектов, а сетка
+ * услуг расширена с пяти до восьми направлений.
  *
- *   1 Шапка с мега-меню          → components/Header.tsx (в layout)
- *   2 Герой + перекрывающая медиа → Hero
- *   3 Бегущая строка              → Marquee
- *   4 Карусель вкладок платформы  → PlatformTabs (5 услуг)
- *   5 Полоса-подложка с цитатой   → Statement (высказывание основателя)
- *   6 Сетка карточек аудиторий    → Audiences (карта ЛПР)
- *   7 Две карточки на подложке    → Proof (дифференциаторы)
- *   8 Карусель с тёмной панелью   → PackageCarousel (три пакета)
- *   9 Подвал с закрывающим CTA    → Footer
+ * Порядок выстроен по воронке: чем занимаемся → кто мы → чем докажем →
+ * с кем говорим → как работаем → сколько стоит → что осталось спросить.
  *
- * Между 8 и 9 добавлены два блока, которых у референса нет, но которые
- * требует шаблон главной HRQT (Фаза 3): тёмная секция безопасности и FAQ.
- * Оба свёрстаны в идиоме референса.
+ * Герой намеренно без Reveal: он виден сразу, анимировать первый экран —
+ * значит задержать то, ради чего пришли.
  */
 export default function Home() {
   return (
     <>
-      {/* Hero and the marquee share one glow, exactly as the reference shares
-          one background raster across both. */}
       <div className="brand-glow">
         <Hero />
         <Marquee />
       </div>
-      <PlatformTabs />
-      <Statement />
-      <Audiences />
-      <Proof />
-      <PackageCarousel />
-      <Security />
-      <Process />
-      <Faq />
+
+      <Reveal>
+        <Services />
+      </Reveal>
+      <Reveal>
+        <Statement />
+      </Reveal>
+      <Reveal>
+        <Team />
+      </Reveal>
+      <Reveal>
+        <Projects />
+      </Reveal>
+      <Reveal>
+        <Audiences />
+      </Reveal>
+      <Reveal>
+        <Proof />
+      </Reveal>
+      <Reveal>
+        <PackageCarousel />
+      </Reveal>
+      <Reveal>
+        <Security />
+      </Reveal>
+      <Reveal>
+        <Process />
+      </Reveal>
+      <Reveal>
+        <Faq />
+      </Reveal>
       <Footer />
     </>
   );

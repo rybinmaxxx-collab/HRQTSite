@@ -5,17 +5,15 @@ import { Button, HeadingRow, Section, SectionTitle } from "@/components/ui";
 import { packages } from "@/content/site";
 
 /**
- * Section 8 of the reference: the case-study carousel.
+ * Форматы работы — три пакета.
  *
- * Geometry from SECTION_MAP.md (репозиторий aura): heading left with two buttons
- * right; a slide of two panels — a gradient-filled dark panel carrying three
- * stat columns, a light-weight pull quote and an attribution, beside a white
- * panel with an uppercase tag row, a 22px→1.875rem heading, body and a quiet
- * CTA; a selector strip beneath, the active item underlined in the accent.
+ * Геометрия панелей — из SECTION_MAP.md (репозиторий aura): градиентная панель
+ * с тремя колонками фактов и крупной лёгкой строкой рядом со светлой панелью,
+ * где ряд надзаголовков, заголовок 22px→1.875rem, текст и тихая кнопка.
  *
- * The reference fills it with customer case studies. HRQT has none it may
- * publish under the Фаза 1 NDA framing, so the same component carries the
- * three work formats — which is what a visitor is actually choosing between.
+ * По ТЗ переключатель переехал наверх блока, над карточками, и стал
+ * сегментированным контролом: под панелью он читался как подпись, а не как
+ * управление. Точки-маркеры в составе пакета убраны.
  */
 export function PackageCarousel() {
   const [active, setActive] = useState(1);
@@ -41,8 +39,31 @@ export function PackageCarousel() {
         />
       </HeadingRow>
 
-      <div className="mt-12 grid grid-cols-1 overflow-hidden rounded-[var(--radius-card)] lg:grid-cols-2">
-        {/* Left: the dark gradient panel. */}
+      <div
+        role="tablist"
+        aria-label="Форматы работы"
+        className="mt-10 mb-8 flex w-full gap-1 overflow-x-auto rounded-[var(--radius-pill)] bg-soft p-1 sm:w-fit"
+      >
+        {packages.items.map((p, i) => (
+          <button
+            key={p.tab}
+            role="tab"
+            type="button"
+            aria-selected={i === active}
+            onClick={() => setActive(i)}
+            className={`shrink-0 grow cursor-pointer rounded-[var(--radius-pill)] px-5 py-2.5 text-base leading-5 font-medium transition-all duration-300 ease-in-out sm:grow-0 ${
+              i === active ? "bg-surface text-ink" : "text-muted hover:text-ink-2"
+            }`}
+          >
+            {p.tab}
+          </button>
+        ))}
+      </div>
+
+      <div
+        role="tabpanel"
+        className="grid grid-cols-1 overflow-hidden rounded-[var(--radius-card)] lg:grid-cols-2"
+      >
         <div className="flex flex-col justify-between gap-10 bg-gradient-to-br from-accent to-accent-far p-8 text-white md:p-12">
           <dl className="grid grid-cols-3 gap-4">
             {item.stats.map((s) => (
@@ -61,7 +82,6 @@ export function PackageCarousel() {
           </p>
         </div>
 
-        {/* Right: the story panel. */}
         <div className="flex flex-col bg-soft p-8 md:p-12">
           <div className="mb-6 flex flex-wrap gap-x-6 gap-y-2">
             {item.tags.map((t) => (
@@ -83,25 +103,6 @@ export function PackageCarousel() {
             {item.cta.label}
           </Button>
         </div>
-      </div>
-
-      {/* Selector strip. The reference uses customer logos; these are names. */}
-      <div className="mt-8 flex flex-wrap justify-center gap-x-10 gap-y-4">
-        {packages.items.map((p, i) => (
-          <button
-            key={p.tab}
-            type="button"
-            aria-pressed={i === active}
-            onClick={() => setActive(i)}
-            className={`cursor-pointer border-b-2 pb-2 font-display text-base font-medium tracking-[-0.02em] transition-colors duration-300 ease-in-out ${
-              i === active
-                ? "border-accent text-ink"
-                : "border-transparent text-muted hover:text-ink-2"
-            }`}
-          >
-            {p.tab}
-          </button>
-        ))}
       </div>
     </Section>
   );

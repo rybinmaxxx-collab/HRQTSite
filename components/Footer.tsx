@@ -65,12 +65,15 @@ export function Footer() {
             >
               {footer.contacts.email}
             </a>
-            <a
-              href={brand.telegram}
-              className="w-fit text-sm text-ink-2 transition-colors duration-300 ease-in-out hover:text-accent-strong"
+            {/* Telegram убран по требованию заказчика: блокировки и
+                корпоративные политики делают его плохим первым каналом. */}
+            <Link
+              prefetch={false}
+              href={footer.contacts.action.href}
+              className="mt-1 w-fit rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm leading-5 font-medium text-accent-strong transition-all duration-300 ease-in-out hover:bg-line"
             >
-              {footer.contacts.telegram}
-            </a>
+              {footer.contacts.action.label}
+            </Link>
           </div>
         </footer>
 
