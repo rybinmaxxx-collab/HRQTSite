@@ -19,7 +19,9 @@ export const brand = {
   name: "HRQT",
   descriptor: "Кадровые технологии",
   email: "hello@hrqt.ru",
-  legal: "© 2026 HRQT · ИП · реквизиты",
+  phone: "+7 495 120-44-08",
+  phoneHref: "tel:+74951204408",
+  legal: "© 2026 ООО «ЭйчАрКьюТи» · ИНН 7702450912",
 } as const;
 
 /**
@@ -96,7 +98,7 @@ export const nav = {
           title: "Контакты",
           links: [
             { label: "Связаться", href: "/contacts" },
-            { label: "Реквизиты", href: "/contacts" },
+            { label: "Реквизиты", href: "/contacts#requisites" },
           ],
         },
         {
@@ -484,6 +486,10 @@ export const footer = {
   contacts: {
     title: "Контакты",
     email: brand.email,
+    phone: brand.phone,
+    phoneHref: brand.phoneHref,
+    address: "Москва, ул. Трубная, 12",
+    hours: "Пн–Пт, 10:00–19:00 МСК",
     // Telegram убран сознательно: блокировки и корпоративные политики
     // заказчиков делают его плохим первым каналом. Приоритет — почта.
     action: { label: "Заявка через сайт", href: "/contacts" },

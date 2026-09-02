@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { SplitTitle } from "@/components/motion";
 import { typo } from "@/lib/typo";
 
 /**
@@ -20,7 +21,19 @@ const TONE = {
 
 /**
  * The section shell. Reproduce this and the page rhythm falls out for free:
- * 4rem of vertical padding below md, 5rem above, and nothing else.
+ * одна плавная вертикальная величина --space-section и больше ничего.
+ *
+ * Здесь же исправлены две вещи, из-за которых разделы налезали друг на друга.
+ *
+ * Первая — `first:pt-0`. Задумывалось, что верхний отступ снимается у самого
+ * первого раздела страницы, но каждый раздел обёрнут в отдельный контейнер
+ * появления и внутри него всегда оказывается первым ребёнком. Селектор
+ * срабатывал у всех: верхнего отступа не было ни у одного раздела, и соседние
+ * блоки склеивались в один. Убрано.
+ *
+ * Вторая — `flex` на самой секции. Секция во flex-контексте перестаёт быть
+ * блоком, и вертикальные отступы в ней считаются иначе; вместе с первой
+ * ошибкой это давало «съехавшие» блоки на планшете. Секция снова блок.
  */
 export function Section({
   id,
@@ -36,7 +49,7 @@ export function Section({
   return (
     <section
       id={id}
-      className={`relative z-[5] flex py-[var(--min-spacing-section)] first:pt-0 md:py-[var(--max-spacing-section)] ${TONE[tone]} ${className}`}
+      className={`relative z-[5] py-[var(--space-section)] ${TONE[tone]} ${className}`}
     >
       <Container>{children}</Container>
     </section>
@@ -90,21 +103,23 @@ export function SectionTitle({
   lead,
   accent,
   tail,
+  as = "h2",
   className = "",
 }: {
   lead: string;
   accent?: string;
   tail?: string;
+  as?: "h1" | "h2" | "h3";
   className?: string;
 }) {
   return (
-    <h2
-      className={`font-display text-[2rem] leading-[2.25rem] font-bold tracking-[-1px] md:text-[3.25rem] md:leading-[3.5rem] md:tracking-[-2px] ${className}`}
-    >
-      {typo(lead)}
-      {accent ? <strong>{typo(accent)}</strong> : null}
-      {tail ? typo(tail) : null}
-    </h2>
+    <SplitTitle
+      as={as}
+      lead={lead}
+      accent={accent}
+      tail={tail}
+      className={`font-display text-h2 leading-[1.08] font-bold tracking-[-0.03em] text-balance ${className}`}
+    />
   );
 }
 
@@ -120,8 +135,11 @@ export function HeadingRow({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-col items-start justify-between gap-6 md:mb-0 md:flex-row md:items-end">
-      <div>{children}</div>
+    // Отступ снизу был `mb-6 md:mb-0` — на десктопе заголовок вплотную упирался
+    // в следующий за ним абзац, и ряд читался как часть текста. Теперь отступ
+    // один и не исчезает на широком экране.
+    <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+      <div className="min-w-0">{children}</div>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>
   );
@@ -161,7 +179,10 @@ export function Button({
   return (
     <Link prefetch={false}
       href={href}
-      className={`relative inline-flex w-fit cursor-pointer items-center gap-2 overflow-hidden rounded-[var(--radius-pill)] px-4 text-base leading-5 font-medium transition-all duration-300 ease-in-out min-h-[2.75rem] ${VARIANTS[variant]} ${className}`}
+      // `w-fit` убран: inline-flex и так сжимается по содержимому, а в
+      // колоночном flex-контейнере (мобильный ряд CTA, ящик меню) он мешал
+      // кнопке растянуться на ширину экрана — палец получал узкую цель у края.
+      className={`relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-[var(--radius-pill)] px-5 text-base leading-5 font-medium transition-all duration-300 ease-in-out min-h-[2.75rem] ${VARIANTS[variant]} ${className}`}
     >
       <span className="mx-1 text-center">{children}</span>
     </Link>

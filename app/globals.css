@@ -56,10 +56,25 @@
      is the craft being borrowed, and it lands within 56px of the same
      measure while behaving better between breakpoints. */
   --max-w-content: 76rem;
-  --spacing-content: 5.75%;
-  --min-spacing-section: 4rem; /* below md */
-  --max-spacing-section: 5rem; /* md and up */
+  /* Процентный отступ хорош на широком экране и слишком мал на узком: 5.75%
+     от 375px — это 21px, текст лип к кромке. max() ставит нижний предел. */
+  --spacing-content: max(1.25rem, 5.75%);
   --h-nav: 5rem;
+
+  /* Ритм страницы одной переменной вместо пары min/max с брейкпоинтом.
+     Между 3.5rem и 6.5rem значение едет плавно, поэтому на планшете больше
+     нет ступеньки, из-за которой соседние блоки читались как один. */
+  --space-section: clamp(3.5rem, 6.5vw, 6.5rem);
+  --min-spacing-section: 4rem; /* оставлено для совместимости со старой разметкой */
+  --max-spacing-section: 5rem;
+
+  /* Плавная типографическая шкала. Раньше размеры переключались на md
+     скачком с 2rem до 3.25rem: между 768 и 1024px заголовки выглядели то
+     мелкими, то распирающими колонку. */
+  --text-display: clamp(2.25rem, 6.2vw, 4.25rem); /* H1 */
+  --text-h2: clamp(1.75rem, 4.2vw, 3.25rem);
+  --text-h3: clamp(1.125rem, 1.6vw, 1.375rem);
+  --text-lead: clamp(1rem, 1.5vw, 1.1875rem);
 
   /* ---- Type --------------------------------------------------------- */
   /* Onest for display, Inter for text. The Beamery recon proposed Space
@@ -77,6 +92,23 @@
 
   /* ---- Motion ------------------------------------------------------- */
   --animation-delay-base: 0.15s;
+
+  /* Система движения «Контур». Три длительности и две кривые на весь сайт —
+     если тайминг не из этого списка, значит для него нет причины.
+
+     --ease-contour доводит движение почти до конца в первой трети времени и
+     дальше только доезжает. Это и даёт ощущение механизма, а не пружины:
+     блок открывается решительно и останавливается без отскока. Overshoot
+     (back.out) здесь сознательно не используется — на деловом B2B-контенте
+     он читается как неряшливость. */
+  --ease-contour: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 220ms;
+  --dur-base: 520ms;
+  --dur-slow: 760ms;
+  /* Шаг волны по сетке. 60 мс — верх рекомендуемого коридора 20–100 мс:
+     заметно, но хвост из восьми карточек укладывается в полсекунды. */
+  --stagger-step: 60ms;
 }
 
 /*
@@ -172,34 +204,315 @@ h3 > strong,
   opacity: 1;
 }
 
-/*
- * Появление блока при скролле. Состоянием управляет components/Reveal.tsx.
- * Движение намеренно маленькое: композиция снята с сайта, который при скролле
- * не анимирует ничего, и крупный эффект спорил бы с его характером.
- */
-.reveal {
+/* ==========================================================================
+ * MOTION SYSTEM «Контур»
+ *
+ * Прошлые проекты открывали блоки одинаково: opacity плюс сдвиг на 14px.
+ * Здесь другой принцип. У HRQT единственный графический мотив — обведённый
+ * контур с точкой внутри, и движение выведено из него: блок не выезжает, а
+ * раскрывается апертурой — нижняя кромка маски уходит вниз, и содержимое
+ * проступает изнутри. Заголовки собираются по словам из-под собственной
+ * строки, сетки открываются волной, цифры доезжают до значения.
+ *
+ * Правил ровно пять (апертура, волна, слова, счётчик, пятно света). Больше не
+ * нужно: каждое новое движение на странице отбирает внимание у предыдущего.
+ *
+ * Гейт html.js-motion — не украшение. Всё, что прячет контент до появления,
+ * живёт только под ним, а сам класс ставится инлайновым скриптом в <head> и
+ * только при выключенном prefers-reduced-motion. Значит: без JS, при ошибке
+ * загрузки и у тех, кто просил не анимировать, страница отдаётся сразу в
+ * финальном виде. Краулер и скринридер видят текст всегда.
+ * ========================================================================== */
+
+/* --- 1. Апертура: базовое появление блока ------------------------------- */
+
+html.js-motion [data-motion] {
+  transition-delay: var(--md, 0ms);
+  transition-timing-function: var(--ease-contour);
+}
+
+html.js-motion [data-motion="aperture"] {
+  transition-property: opacity, transform, clip-path;
+  transition-duration: var(--dur-base), var(--dur-slow), var(--dur-slow);
+}
+
+html.js-motion [data-motion="aperture"][data-in="false"] {
   opacity: 0;
-  transform: translateY(14px);
-  transition:
-    opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: opacity, transform;
+  /* Маска срезает нижнюю пятую часть блока и уезжает вниз при появлении.
+     clip-path анимируется композитором и, в отличие от height, не заставляет
+     браузер пересчитывать раскладку соседей. */
+  clip-path: inset(0 0 18% 0);
+  transform: translate3d(0, 20px, 0);
 }
 
-.reveal[data-shown="true"] {
-  opacity: 1;
-  transform: none;
-  will-change: auto;
+html.js-motion [data-motion="rise"] {
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-base), var(--dur-base);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .reveal[data-shown="false"] {
-    opacity: 1;
-    transform: none;
-    transition: none;
+html.js-motion [data-motion="rise"][data-in="false"] {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+}
+
+html.js-motion [data-motion="fade"] {
+  transition-property: opacity;
+  transition-duration: var(--dur-slow);
+}
+
+html.js-motion [data-motion="fade"][data-in="false"] {
+  opacity: 0;
+}
+
+html.js-motion [data-motion="scale"] {
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-base), var(--dur-slow);
+}
+
+html.js-motion [data-motion="scale"][data-in="false"] {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+/* --- 2. Волна по сетке --------------------------------------------------- */
+
+html.js-motion .m-stagger > * {
+  transition-property: opacity, transform, clip-path;
+  transition-duration: var(--dur-base), var(--dur-slow), var(--dur-slow);
+  transition-timing-function: var(--ease-contour);
+  transition-delay: calc(var(--md, 0ms) + var(--mi, 0) * var(--stagger-step));
+}
+
+html.js-motion [data-motion-stagger][data-in="false"] > * {
+  opacity: 0;
+  clip-path: inset(0 0 14% 0);
+  transform: translate3d(0, 18px, 0);
+}
+
+/* Индекс волны задаётся разметкой, а не JS: React не должен знать о таймингах.
+   С девятой карточки задержка перестаёт расти — иначе хвост длинной сетки
+   доезжает через полторы секунды после того, как читатель до него добрался. */
+html.js-motion .m-stagger > *:nth-child(1) { --mi: 0; }
+html.js-motion .m-stagger > *:nth-child(2) { --mi: 1; }
+html.js-motion .m-stagger > *:nth-child(3) { --mi: 2; }
+html.js-motion .m-stagger > *:nth-child(4) { --mi: 3; }
+html.js-motion .m-stagger > *:nth-child(5) { --mi: 4; }
+html.js-motion .m-stagger > *:nth-child(6) { --mi: 5; }
+html.js-motion .m-stagger > *:nth-child(7) { --mi: 6; }
+html.js-motion .m-stagger > *:nth-child(n + 8) { --mi: 7; }
+
+/* --- 3. Заголовок по словам ---------------------------------------------- */
+
+/* Градиент акцента живёт на самом слове, а не на внешнем <strong>.
+   background-clip: text красит глифы своего элемента; потомок с transform
+   уезжает в отдельный слой, и заливка до него уже не достаёт — акцентные
+   слова просто пропали бы. Правило вне гейта js-motion: цвет заголовка не
+   должен зависеть от того, доехал ли скрипт. */
+.m-word-accent {
+  background-image: linear-gradient(
+    265deg,
+    var(--color-accent) 0,
+    var(--color-accent-strong) 55%,
+    var(--color-accent-far) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Тот же градиент на тёмной секции недобирает по контрасту: #2f6bed на
+   #14181f даёт около 2.5:1 при норме 3:1 для крупного текста. На чернильном
+   фоне акцент берёт два осветлённых стопа того же семейства — цвет узнаётся,
+   заголовок читается. */
+.m-on-ink .m-word-accent {
+  background-image: linear-gradient(265deg, #7ea6ff 0, #9db4ff 55%, #b39dff 100%);
+}
+
+/* Соединяющая линия шагов процесса. Только с lg, где шаги стоят в ряд:
+   на стеке она соединяла бы то, что и так идёт друг за другом. Линия
+   дорисовывается вместе с появлением ряда — отсюда transform, а не width. */
+.m-track {
+  position: relative;
+}
+
+@media (min-width: 64rem) {
+  .m-track::before {
+    content: "";
+    position: absolute;
+    top: 17px;
+    right: 2rem;
+    left: 2rem;
+    height: 1px;
+    background: var(--color-line);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform var(--dur-slow) var(--ease-contour) 120ms;
   }
 
+  .m-track[data-in="true"]::before {
+    transform: scaleX(1);
+  }
+
+  html:not(.js-motion) .m-track::before {
+    transform: none;
+  }
+}
+
+html.js-motion .m-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* Маска обрезает строку ровно по базовой линии, и выносные элементы у
+     «р», «у», «д» срезаются вместе с ней. Пара padding/margin опускает
+     кромку и возвращает отступ обратно, не сдвигая раскладку. */
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+
+html.js-motion .m-word-in {
+  display: inline-block;
+  transition:
+    transform 640ms var(--ease-contour) calc(var(--mi, 0) * 38ms),
+    opacity 360ms linear calc(var(--mi, 0) * 38ms);
+}
+
+html.js-motion [data-motion-words][data-in="false"] .m-word-in {
+  opacity: 0;
+  transform: translate3d(0, 110%, 0);
+}
+
+/* --- 4. Пятно света под курсором ----------------------------------------- */
+
+.m-spot {
+  position: relative;
+  isolation: isolate;
+}
+
+.m-spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    16rem 16rem at var(--mx, 50%) var(--my, 0%),
+    color-mix(in srgb, var(--color-accent) 13%, transparent),
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-soft);
+}
+
+.m-spot:hover::before,
+.m-spot:focus-within::before {
+  opacity: 1;
+}
+
+/* Пальцу пятно ничего не сообщает: наведения без нажатия там не бывает. */
+@media (hover: none) {
+  .m-spot::before {
+    content: none;
+  }
+}
+
+/* --- 5. Полоса прогресса в шапке ----------------------------------------- */
+
+.m-progress {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  transform: scaleX(var(--mp, 0));
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-far));
+}
+
+/* Панель меню появляется по монтированию, а не по скроллу, поэтому здесь
+   анимация, а не переход: у только что вставленного узла нет предыдущего
+   состояния, между которым transition мог бы проехать. */
+@keyframes m-menu-in {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes m-menu-col {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html.js-motion .m-menu {
+  animation: m-menu-in 300ms var(--ease-contour) both;
+}
+
+html.js-motion .m-menu-item {
+  animation: m-menu-col 320ms var(--ease-contour) both;
+  animation-delay: calc(80ms + var(--mi, 0) * 45ms);
+}
+
+html.js-motion .m-menu-item:nth-child(1) { --mi: 0; }
+html.js-motion .m-menu-item:nth-child(2) { --mi: 1; }
+html.js-motion .m-menu-item:nth-child(3) { --mi: 2; }
+html.js-motion .m-menu-item:nth-child(n + 4) { --mi: 3; }
+
+/* Смена содержимого во вкладках. Тот же случай, что и с меню: узел заменяется
+   целиком, переходу не между чем ехать. Длительность заметно короче появления
+   блока — переключение по клику должно догонять палец, а не обгонять его. */
+@keyframes m-swap {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html.js-motion .m-swap {
+  animation: m-swap 360ms var(--ease-contour) both;
+}
+
+/* --- 6. Шапка, уходящая при прокрутке вниз -------------------------------- */
+
+.m-header {
+  transition:
+    transform 420ms var(--ease-contour),
+    background-color var(--dur-fast) var(--ease-soft),
+    border-color var(--dur-fast) var(--ease-soft);
+}
+
+.m-header[data-hidden="true"] {
+  transform: translate3d(0, -100%, 0);
+}
+
+/* --- 7. Бегущая строка --------------------------------------------------- */
+
+/* Требование доступности: непрерывное движение должно останавливаться.
+   Здесь оно останавливается и по наведению, и по приходу фокуса с клавиатуры
+   — второе важнее, потому что читать бегущий текст с клавиатуры иначе
+   невозможно. */
+.marquee:hover .animate-marquee,
+.marquee:focus-within .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* --- 8. Отказ от движения ------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
   .animate-marquee {
     animation: none;
   }
@@ -207,6 +520,8 @@ h3 > strong,
   *,
   *::before,
   *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
@@ -229,6 +544,42 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  /* Страховка от горизонтальной прокрутки: бегущая строка и широкие сетки на
+     360px иначе вылезают за кромку. Именно clip, а не hidden — hidden на
+     body делает предком прокрутки его самого и ломает position: sticky. */
+  overflow-x: clip;
+}
+
+/* Нижняя граница тач-цели. 44×44 CSS-пикселя — минимум, ниже которого палец
+   промахивается; на десктопе правило не мешает, потому что задаёт минимум,
+   а не фиксированный размер. */
+@media (pointer: coarse) {
+  a[class*="rounded"],
+  button,
+  summary,
+  [role="tab"] {
+    min-height: 2.75rem;
+  }
+}
+
+/* Ссылка «к содержимому» для клавиатуры: первым Tab'ом со страницы можно
+   перепрыгнуть меню целиком. Видна только когда получает фокус. */
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 9999;
+  transform: translateY(-200%);
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  padding: 0.75rem 1.25rem;
+  color: #fff;
+  font-size: 0.875rem;
+  transition: transform var(--dur-fast) var(--ease-contour);
+}
+
+.skip-link:focus-visible {
+  transform: none;
 }
 
 :focus-visible {

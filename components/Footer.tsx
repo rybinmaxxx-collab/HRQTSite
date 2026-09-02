@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { Reveal, SplitTitle } from "@/components/motion";
 import { Button, Container } from "@/components/ui";
 import { brand, closing, footer } from "@/content/site";
 
@@ -15,17 +16,18 @@ export function Footer() {
   return (
     <div className="brand-glow">
       <Container>
-        <div className="grid grid-cols-1 items-start gap-8 py-[var(--max-spacing-section)] md:grid-cols-2 md:gap-16">
-          <h2 className="font-display text-[2rem] leading-[2.25rem] font-bold tracking-[-1.4px] text-balance md:text-[2.75rem] md:leading-[3rem]">
-            {closing.titleLead}
-            <strong>{closing.titleAccent}</strong>
-          </h2>
-          <div className="flex flex-col items-start gap-6">
-            <p className="text-xl leading-[1.68] tracking-[-0.01em] text-ink-2">
+        <div className="grid grid-cols-1 items-start gap-8 py-[var(--space-section)] md:grid-cols-2 md:gap-16">
+          <SplitTitle
+            lead={closing.titleLead}
+            accent={closing.titleAccent}
+            className="font-display text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] font-bold tracking-[-0.035em] text-balance"
+          />
+          <Reveal variant="rise" delay={140} className="flex flex-col items-start gap-6">
+            <p className="text-lead leading-[1.68] tracking-[-0.01em] text-ink-2">
               {closing.lead}
             </p>
             <Button href={closing.cta.href}>{closing.cta.label}</Button>
-          </div>
+          </Reveal>
         </div>
 
         <hr className="border-line" />
@@ -65,12 +67,20 @@ export function Footer() {
             >
               {footer.contacts.email}
             </a>
+            <a
+              href={footer.contacts.phoneHref}
+              className="w-fit text-sm text-ink-2 transition-colors duration-300 ease-in-out hover:text-accent-strong"
+            >
+              {footer.contacts.phone}
+            </a>
+            <p className="text-sm leading-[1.55] text-muted">{footer.contacts.address}</p>
+            <p className="text-sm leading-[1.55] text-muted">{footer.contacts.hours}</p>
             {/* Telegram убран по требованию заказчика: блокировки и
                 корпоративные политики делают его плохим первым каналом. */}
             <Link
               prefetch={false}
               href={footer.contacts.action.href}
-              className="mt-1 w-fit rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm leading-5 font-medium text-accent-strong transition-all duration-300 ease-in-out hover:bg-line"
+              className="mt-1 inline-flex min-h-[2.75rem] w-fit items-center rounded-[var(--radius-pill)] bg-accent-soft px-4 text-sm leading-5 font-medium text-accent-strong transition-all duration-300 ease-in-out hover:bg-line"
             >
               {footer.contacts.action.label}
             </Link>

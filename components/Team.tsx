@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Counter, Reveal, Stagger } from "@/components/motion";
 import { Section, SectionTitle } from "@/components/ui";
 import { team } from "@/content/site";
 
@@ -11,6 +12,11 @@ import { team } from "@/content/site";
  * подмены контента по ширине экрана: полный текст всегда в разметке — важно
  * для поисковиков и скринридеров, — а на узких экранах он свёрнут до короткой
  * версии и раскрывается кнопкой. На десктопе показан целиком сразу.
+ *
+ * Колонка с цифрами прижата к верху (self-start) и на планшете уезжала под
+ * текст пустой белой плитой во всю ширину. Теперь до lg это горизонтальный
+ * ряд из трёх фактов, а не столбец: те же данные занимают одну строку вместо
+ * трети экрана.
  */
 export function Team() {
   const [expanded, setExpanded] = useState(false);
@@ -45,22 +51,30 @@ export function Team() {
             type="button"
             aria-expanded={expanded}
             onClick={() => setExpanded((v) => !v)}
-            className="mt-6 w-fit cursor-pointer rounded-[var(--radius-pill)] bg-surface px-4 py-2 text-sm leading-5 font-medium text-accent-strong transition-all duration-300 ease-in-out hover:bg-line lg:hidden"
+            className="mt-6 inline-flex min-h-[2.75rem] w-fit cursor-pointer items-center rounded-[var(--radius-pill)] bg-surface px-5 text-sm leading-5 font-medium text-accent-strong transition-all duration-300 ease-in-out hover:bg-line lg:hidden"
           >
             {expanded ? "Свернуть" : "Читать полностью"}
           </button>
         </div>
 
-        <dl className="flex flex-col gap-6 self-start rounded-[var(--radius-card)] bg-surface p-8">
-          {team.stats.map((s) => (
-            <div key={s.label}>
-              <dt className="font-display text-[2.5rem] leading-none font-bold tracking-[-2px] text-accent-strong">
-                {s.value}
-              </dt>
-              <dd className="mt-2 text-base leading-[1.5] text-ink-2">{s.label}</dd>
-            </div>
-          ))}
-        </dl>
+        <Reveal variant="aperture" delay={120} className="self-start">
+          <Stagger
+            as="dl"
+            variant="rise"
+            className="grid grid-cols-3 gap-4 rounded-[var(--radius-card)] bg-surface p-6 sm:gap-6 lg:grid-cols-1 lg:gap-6 lg:p-8"
+          >
+            {team.stats.map((s) => (
+              <div key={s.label}>
+                <dt className="font-display text-[clamp(1.75rem,5vw,2.5rem)] leading-none font-bold tracking-[-0.04em] text-accent-strong">
+                  <Counter value={s.value} />
+                </dt>
+                <dd className="mt-2 text-sm leading-[1.45] text-ink-2 sm:text-base sm:leading-[1.5]">
+                  {s.label}
+                </dd>
+              </div>
+            ))}
+          </Stagger>
+        </Reveal>
       </div>
     </Section>
   );

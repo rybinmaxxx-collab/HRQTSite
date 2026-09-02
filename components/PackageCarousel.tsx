@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Counter, Reveal } from "@/components/motion";
 import { Button, HeadingRow, Section, SectionTitle } from "@/components/ui";
 import { packages } from "@/content/site";
 
@@ -8,12 +9,25 @@ import { packages } from "@/content/site";
  * Форматы работы — три пакета.
  *
  * Геометрия панелей — из SECTION_MAP.md (репозиторий aura): градиентная панель
- * с тремя колонками фактов и крупной лёгкой строкой рядом со светлой панелью,
- * где ряд надзаголовков, заголовок 22px→1.875rem, текст и тихая кнопка.
+ * с колонками фактов и крупной лёгкой строкой рядом со светлой панелью, где
+ * ряд надзаголовков, заголовок, текст и тихая кнопка.
  *
- * По ТЗ переключатель переехал наверх блока, над карточками, и стал
- * сегментированным контролом: под панелью он читался как подпись, а не как
- * управление. Точки-маркеры в составе пакета убраны.
+ * Что исправлено в этом проходе — пустоты внутри пары панелей.
+ *
+ *   1. Левая панель стояла на justify-between: цифры прибивало к верхней
+ *      кромке, крупную строку — к нижней, а высоту задавала правая колонка.
+ *      Стоило правому тексту стать длиннее, и посередине левой панели
+ *      открывалась дыра в полтора десятка сантиметров. Теперь содержимое
+ *      левой панели центрировано: свободное место делится поровну сверху и
+ *      снизу и перестаёт читаться как пропущенный блок.
+ *   2. Абзац в правой панели стоял на grow и отталкивал кнопку в самый низ —
+ *      между текстом и кнопкой висела такая же пустота. Кнопка вернулась к
+ *      тексту на фиксированный отступ.
+ *   3. Ряды фактов на узком экране ломались на три колонки по одному слову.
+ *      Ниже sm их два в ряд.
+ *
+ * Цифры фактов доезжают счётчиком: в блоке про сроки и объёмы это единственное
+ * место, где движение несёт смысл, а не украшает.
  */
 export function PackageCarousel() {
   const [active, setActive] = useState(1);
@@ -42,7 +56,7 @@ export function PackageCarousel() {
       <div
         role="tablist"
         aria-label="Форматы работы"
-        className="mt-10 mb-8 flex w-full gap-1 overflow-x-auto rounded-[var(--radius-pill)] bg-soft p-1 sm:w-fit"
+        className="mt-8 mb-8 flex w-full gap-1 overflow-x-auto rounded-[var(--radius-pill)] bg-soft p-1 sm:w-fit"
       >
         {packages.items.map((p, i) => (
           <button
@@ -51,8 +65,8 @@ export function PackageCarousel() {
             type="button"
             aria-selected={i === active}
             onClick={() => setActive(i)}
-            className={`shrink-0 grow cursor-pointer rounded-[var(--radius-pill)] px-5 py-2.5 text-base leading-5 font-medium transition-all duration-300 ease-in-out sm:grow-0 ${
-              i === active ? "bg-surface text-ink" : "text-muted hover:text-ink-2"
+            className={`shrink-0 grow cursor-pointer rounded-[var(--radius-pill)] px-4 py-2.5 text-sm leading-5 font-medium transition-all duration-300 ease-in-out sm:grow-0 sm:px-5 sm:text-base ${
+              i === active ? "bg-surface text-ink shadow-[0_1px_2px_rgba(20,24,31,0.06)]" : "text-muted hover:text-ink-2"
             }`}
           >
             {p.tab}
@@ -60,50 +74,52 @@ export function PackageCarousel() {
         ))}
       </div>
 
-      <div
-        role="tabpanel"
-        className="grid grid-cols-1 overflow-hidden rounded-[var(--radius-card)] lg:grid-cols-2"
+      <Reveal
+        variant="aperture"
+        className="overflow-hidden rounded-[var(--radius-card)]"
       >
-        <div className="flex flex-col justify-between gap-10 bg-gradient-to-br from-accent to-accent-far p-8 text-white md:p-12">
-          <dl className="grid grid-cols-3 gap-4">
-            {item.stats.map((s) => (
-              <div key={s.label}>
-                <dt className="text-[0.8125rem] font-semibold tracking-[0.08em] text-white/70 uppercase">
-                  {s.label}
-                </dt>
-                <dd className="mt-2 font-display text-base font-bold tracking-[-0.02em]">
-                  {s.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <p className="text-[1.375rem] leading-[1.4] font-light tracking-[-0.02em]">
-            {item.pull}
-          </p>
-        </div>
-
-        <div className="flex flex-col bg-soft p-8 md:p-12">
-          <div className="mb-6 flex flex-wrap gap-x-6 gap-y-2">
-            {item.tags.map((t) => (
-              <span
-                key={t}
-                className="text-[0.8125rem] font-semibold tracking-[0.08em] text-accent-strong uppercase"
-              >
-                {t}
-              </span>
-            ))}
+        <div key={item.tab} role="tabpanel" className="m-swap grid grid-cols-1 lg:grid-cols-2">
+          <div className="flex flex-col justify-center gap-8 bg-gradient-to-br from-accent to-accent-far p-8 text-white md:p-12">
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3">
+              {item.stats.map((s) => (
+                <div key={s.label}>
+                  <dt className="text-[0.75rem] font-semibold tracking-[0.08em] text-white/70 uppercase">
+                    {s.label}
+                  </dt>
+                  <dd className="mt-2 font-display text-base font-bold tracking-[-0.02em]">
+                    <Counter value={s.value} />
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <p className="text-[1.1875rem] leading-[1.45] font-light tracking-[-0.02em] md:text-[1.375rem]">
+              {item.pull}
+            </p>
           </div>
-          <h3 className="mb-4 font-display text-[22px] leading-[1.25] font-bold tracking-[-0.033em] md:text-3xl">
-            {item.title}
-          </h3>
-          <p className="mb-8 grow text-base leading-[1.625] tracking-[-0.01em] text-ink-2">
-            {item.body}
-          </p>
-          <Button href={item.cta.href} variant="secondary">
-            {item.cta.label}
-          </Button>
+
+          <div className="flex flex-col bg-soft p-8 md:p-12">
+            <div className="mb-6 flex flex-wrap gap-x-6 gap-y-2">
+              {item.tags.map((t) => (
+                <span
+                  key={t}
+                  className="text-[0.75rem] font-semibold tracking-[0.08em] text-accent-strong uppercase"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+            <h3 className="mb-4 font-display text-[1.25rem] leading-[1.25] font-bold tracking-[-0.03em] md:text-[1.75rem]">
+              {item.title}
+            </h3>
+            <p className="mb-8 text-base leading-[1.625] tracking-[-0.01em] text-ink-2">
+              {item.body}
+            </p>
+            <Button href={item.cta.href} variant="secondary" className="w-fit self-start">
+              {item.cta.label}
+            </Button>
+          </div>
         </div>
-      </div>
+      </Reveal>
     </Section>
   );
 }

@@ -1,3 +1,4 @@
+import { Reveal, SplitTitle, Stagger } from "@/components/motion";
 import { Button, Container, ContourMark } from "@/components/ui";
 import { typo } from "@/lib/typo";
 import { hero, marquee } from "@/content/site";
@@ -7,56 +8,82 @@ import { hero, marquee } from "@/content/site";
  *
  * Geometry from SECTION_MAP.md (репозиторий aura), taken from the served markup:
  * pt-16 pb-12, inner xl:px-26, centre-aligned — the only centred block on the
- * page. H1 at 2.5rem/1 with -1.28px tracking, rising to 5rem with -3.78px at
- * lg (dropped to 4.25rem/-3px here, because Cyrillic at 5rem overflows this
- * headline). Subhead at 1.1875rem/32px with -0.189px over an 800px measure.
- * CTA row gap-6, quiet button first, then the commercial one.
+ * page. Размер H1 переехал на плавную шкалу --text-display: раньше он прыгал
+ * с 2.5rem сразу на 4.25rem, и в промежутке между планшетом и ноутбуком
+ * заголовок оказывался либо мелким, либо распирал колонку.
  *
- * The reference then places a product screenshot with xl:-mb-31 so it
- * overlaps the section below. HRQT has no product to photograph, so the same
- * slot holds the «весь контур» panel, overlapping the same way.
+ * Референс кладёт под герой скриншот продукта с отрицательным нижним отступом,
+ * чтобы тот наезжал на следующий блок. Здесь этот приём убран, и он же был
+ * источником главной поломки вёрстки: панель уезжала вверх на -7rem, а бегущая
+ * строка компенсировала это своим pt-36. Стоило измениться высоте панели —
+ * на любом промежуточном разрешении, где перестраивалась её сетка, — и два
+ * числа переставали сходиться, блоки наезжали друг на друга. Наложения по
+ * договорённости больше нет: панель просто стоит в потоке.
  */
 export function Hero() {
   return (
     <div className="mt-[var(--h-nav)]">
-      <Container className="relative pt-16 pb-12">
+      <Container className="relative pt-14 pb-12 md:pt-16">
         <div className="flex flex-col items-center px-0 xl:px-26">
-          <h1 className="mb-6 text-center font-display text-[2.5rem] leading-[1] font-bold tracking-[-1.28px] text-balance lg:text-[4.25rem] lg:tracking-[-3px] xl:leading-[4.5rem]">
-            {typo(hero.titleLead)}
-            <strong>{typo(hero.titleAccent)}</strong>
-            {typo(hero.titleTail)}
-          </h1>
+          <SplitTitle
+            as="h1"
+            lead={hero.titleLead}
+            accent={hero.titleAccent}
+            tail={hero.titleTail}
+            className="mb-6 text-center font-display text-display leading-[1.04] font-bold tracking-[-0.035em] text-balance"
+          />
 
-          <p className="mb-8 max-w-[800px] text-center text-[1.1875rem] leading-[32px] font-normal tracking-[-0.189px] text-ink-2">
+          <Reveal
+            as="p"
+            variant="rise"
+            delay={240}
+            className="mb-8 max-w-[800px] text-center text-lead leading-[1.7] font-normal tracking-[-0.01em] text-ink-2"
+          >
             {typo(hero.lead)}
-          </p>
+          </Reveal>
 
-          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:gap-6">
-            <Button href={hero.secondary.href} variant="secondary">
+          <Reveal
+            variant="rise"
+            delay={340}
+            className="mb-5 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:gap-4"
+          >
+            <Button href={hero.secondary.href} variant="secondary" className="justify-center">
               {hero.secondary.label}
             </Button>
-            <Button href={hero.primary.href}>{hero.primary.label}</Button>
-          </div>
+            <Button href={hero.primary.href} className="justify-center">
+              {hero.primary.label}
+            </Button>
+          </Reveal>
 
-          <p className="text-sm text-muted">{hero.note}</p>
+          <Reveal as="p" variant="fade" delay={460} className="text-sm text-muted">
+            {hero.note}
+          </Reveal>
         </div>
 
-        <div className="mx-auto mt-14 w-full rounded-[var(--radius-card)] border border-line bg-surface p-8 md:p-10 xl:-mb-28">
-          <p className="mb-8 font-display text-xl font-bold tracking-[-0.02em]">
+        <Reveal
+          variant="aperture"
+          delay={420}
+          className="mx-auto mt-12 w-full rounded-[var(--radius-card)] border border-line bg-surface p-6 sm:p-8 md:mt-14 md:p-10"
+        >
+          <p className="mb-8 font-display text-lg font-bold tracking-[-0.02em] md:text-xl">
             {hero.panel.title}
           </p>
-          <div className="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+          <Stagger
+            variant="rise"
+            delay={520}
+            className="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4"
+          >
             {hero.panel.items.map((item) => (
               <div key={item.name} className="flex flex-col gap-3">
                 <ContourMark size={40} />
                 <p className="font-display text-base font-bold tracking-[-0.02em]">
                   {item.name}
                 </p>
-                <p className="text-sm text-muted">{item.note}</p>
+                <p className="text-sm leading-[1.6] text-muted">{item.note}</p>
               </div>
             ))}
-          </div>
-        </div>
+          </Stagger>
+        </Reveal>
       </Container>
     </div>
   );
@@ -69,22 +96,24 @@ export function Hero() {
  * the loop is seamless; tiles are 12.5rem × 4.5rem with 0.625rem of padding;
  * both edges are masked by a 4rem fade.
  *
- * The reference runs client logos here. HRQT has none it may show under the
- * Фаза 1 NDA framing, so the strip carries the systems it works in.
+ * Компенсирующий pt-36 убран вместе с наложением панели — см. комментарий к
+ * Hero. Добавлена остановка по наведению и по фокусу: непрерывное движение
+ * должно уметь замирать, иначе прочитать бегущую строку с клавиатуры нельзя.
+ * Дубль списка помечен aria-hidden, чтобы скринридер не читал его дважды.
  */
 export function Marquee() {
   const track = [...marquee, ...marquee];
   return (
-    <div className="relative w-full overflow-hidden pt-4 pb-16 xl:pt-36">
+    <div className="marquee relative w-full overflow-hidden pt-6 pb-14 md:pb-16">
       <div className="marquee-fade" />
       <div className="animate-marquee relative z-0 flex w-fit">
         {track.map((item, i) => (
           <div
             key={`${item}-${i}`}
-            className="flex h-[4.5rem] w-[12.5rem] shrink-0 items-center justify-center p-[0.625rem]"
+            className="flex h-[4.5rem] w-[9.5rem] shrink-0 items-center justify-center p-[0.625rem] sm:w-[12.5rem]"
             aria-hidden={i >= marquee.length}
           >
-            <span className="font-display text-base font-medium tracking-[-0.02em] text-muted">
+            <span className="font-display text-sm font-medium tracking-[-0.02em] whitespace-nowrap text-muted sm:text-base">
               {item}
             </span>
           </div>
