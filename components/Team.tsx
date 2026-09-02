@@ -1,80 +1,76 @@
-"use client";
-
-import { useState } from "react";
-import { Counter, Reveal, Stagger } from "@/components/motion";
-import { Section, SectionTitle } from "@/components/ui";
+import { Reveal, Stagger } from "@/components/motion";
+import { Button, Section, SectionTitle } from "@/components/ui";
 import { team } from "@/content/site";
 
 /**
  * Раздел «О команде HRQT».
  *
- * ТЗ просит переключатель на короткую версию для мобильных. Реализовано без
- * подмены контента по ширине экрана: полный текст всегда в разметке — важно
- * для поисковиков и скринридеров, — а на узких экранах он свёрнут до короткой
- * версии и раскрывается кнопкой. На десктопе показан целиком сразу.
+ * Что здесь было и почему ушло. Слева стояли четыре абзаца с кнопкой «читать
+ * полностью», справа — белая плита с тремя счётчиками: «8+», «8», «1».
+ * Заказчик снял обе половины разом: «перегруз по тексту и недосказанность в
+ * цифрах».
  *
- * Колонка с цифрами прижата к верху (self-start) и на планшете уезжала под
- * текст пустой белой плитой во всю ширину. Теперь до lg это горизонтальный
- * ряд из трёх фактов, а не столбец: те же данные занимают одну строку вместо
- * трети экрана.
+ * Цифры действительно не работали. Счётчик набирает вес тем, что измеряет
+ * результат, а «8 направлений консалтинга» — это оглавление соседнего
+ * раздела, набранное сорок вторым кеглем. Крупный шрифт обещал факт, а
+ * сообщал лозунг, и читатель справедливо не понимал, что с этим делать.
+ *
+ * Замена — деления. Четыре дисциплины, разделённые волосяными линиями:
+ * состав команды виден так же быстро, как читалась колонка цифр, но каждая
+ * строка что-то сообщает. Линия здесь несёт ту же работу, что рамка карточки,
+ * и не добавляет ни фона, ни тени — раздел и без того стоит на цветной
+ * подложке.
+ *
+ * Кнопки «читать полностью» нет: она разворачивала текст прямо в разделе, то
+ * есть требовала клика ради того, что и так можно прочесть на /about. Полная
+ * версия там, ссылка ведёт туда же.
  */
 export function Team() {
-  const [expanded, setExpanded] = useState(false);
-
   return (
     <Section id="team" tone="tint">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
-        <div>
-          <SectionTitle lead={team.title} className="mb-8" />
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
+        <div className="lg:sticky lg:top-[calc(var(--h-nav)+2rem)] lg:self-start">
+          <SectionTitle lead={team.title} className="mb-6" />
 
-          {/* Короткая версия — только на узких экранах и только пока свёрнуто. */}
-          <p
-            className={`text-base leading-[1.68] tracking-[-0.01em] text-ink-2 md:text-lg lg:hidden ${
-              expanded ? "hidden" : ""
-            }`}
-          >
-            {team.short}
-          </p>
-
-          <div className={`flex-col gap-5 lg:flex ${expanded ? "flex" : "hidden"}`}>
-            {team.full.map((para) => (
-              <p
-                key={para.slice(0, 32)}
-                className="text-base leading-[1.68] tracking-[-0.01em] text-ink-2 md:text-lg"
+          <div className="flex flex-col gap-4">
+            {team.lead.map((para, i) => (
+              <Reveal
+                key={para.slice(0, 24)}
+                as="p"
+                variant="rise"
+                delay={80 + i * 80}
+                className="max-w-[34rem] text-base leading-[1.68] tracking-[-0.01em] text-ink-2 md:text-lg"
               >
                 {para}
-              </p>
+              </Reveal>
             ))}
           </div>
 
-          <button
-            type="button"
-            aria-expanded={expanded}
-            onClick={() => setExpanded((v) => !v)}
-            className="mt-6 inline-flex min-h-[2.75rem] w-fit cursor-pointer items-center rounded-[var(--radius-pill)] bg-surface px-5 text-sm leading-5 font-medium text-accent-strong transition-all duration-300 ease-in-out hover:bg-line lg:hidden"
-          >
-            {expanded ? "Свернуть" : "Читать полностью"}
-          </button>
+          <Reveal variant="rise" delay={240} className="mt-8">
+            <Button href={team.action.href} variant="secondary">
+              {team.action.label}
+            </Button>
+          </Reveal>
         </div>
 
-        <Reveal variant="aperture" delay={120} className="self-start">
-          <Stagger
-            as="dl"
-            variant="rise"
-            className="grid grid-cols-3 gap-4 rounded-[var(--radius-card)] bg-surface p-6 sm:gap-6 lg:grid-cols-1 lg:gap-6 lg:p-8"
-          >
-            {team.stats.map((s) => (
-              <div key={s.label}>
-                <dt className="font-display text-[clamp(1.75rem,5vw,2.5rem)] leading-none font-bold tracking-[-0.04em] text-accent-strong">
-                  <Counter value={s.value} />
-                </dt>
-                <dd className="mt-2 text-sm leading-[1.45] text-ink-2 sm:text-base sm:leading-[1.5]">
-                  {s.label}
-                </dd>
-              </div>
-            ))}
-          </Stagger>
-        </Reveal>
+        {/* Деления вместо плиты со счётчиками: первая строка без верхней
+            линии, дальше каждая отделена сверху — так список читается как
+            перечень, а не как таблица. */}
+        <Stagger as="dl" variant="rise" className="flex flex-col lg:pt-2">
+          {team.disciplines.map((d) => (
+            <div
+              key={d.title}
+              className="border-t border-ink/10 py-5 first:border-t-0 first:pt-0 md:py-6"
+            >
+              <dt className="font-display text-lg font-bold tracking-[-0.02em] md:text-[1.375rem]">
+                {d.title}
+              </dt>
+              <dd className="mt-1.5 text-base leading-[1.6] tracking-[-0.01em] text-ink-2">
+                {d.body}
+              </dd>
+            </div>
+          ))}
+        </Stagger>
       </div>
     </Section>
   );

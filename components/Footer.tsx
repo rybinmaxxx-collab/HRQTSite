@@ -2,37 +2,52 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Reveal, SplitTitle } from "@/components/motion";
 import { Button, Container } from "@/components/ui";
-import { brand, closing, footer } from "@/content/site";
+import { brand, footer, footerCta } from "@/content/site";
 
 /**
  * Closing CTA and footer, both on the glow — the reference bookends the page
  * with the same background it opens on.
  *
+ * Призыв над подвалом отключается пропом `cta`. Он нужен там, где страница
+ * заканчивается текстом, и мешает там, где она заканчивается предложением: на
+ * главной последний раздел — пакеты, у каждого своя кнопка заявки, и ещё один
+ * призыв следом читается как повтор.
+ *
  * The legal strip is not decoration: HRQT_юр-сверка (Фаза 9) requires a link
  * to the privacy policy on every page under 152-ФЗ, so it lives here rather
  * than on a single legal page.
  */
-export function Footer() {
+export function Footer({ cta = true }: { cta?: boolean } = {}) {
   return (
     <div className="brand-glow">
       <Container>
-        <div className="grid grid-cols-1 items-start gap-8 py-[var(--space-section)] md:grid-cols-2 md:gap-16">
-          <SplitTitle
-            lead={closing.titleLead}
-            accent={closing.titleAccent}
-            className="font-display text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] font-bold tracking-[-0.035em] text-balance"
-          />
-          <Reveal variant="rise" delay={140} className="flex flex-col items-start gap-6">
-            <p className="text-lead leading-[1.68] tracking-[-0.01em] text-ink-2">
-              {closing.lead}
-            </p>
-            <Button href={closing.cta.href}>{closing.cta.label}</Button>
-          </Reveal>
-        </div>
+        {cta ? (
+          <>
+            <div className="grid grid-cols-1 items-start gap-8 py-[var(--space-section)] md:grid-cols-2 md:gap-16">
+              <SplitTitle
+                lead={footerCta.titleLead}
+                accent={footerCta.titleAccent}
+                className="font-display text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] font-bold tracking-[-0.035em] text-balance"
+              />
+              <Reveal variant="rise" delay={140} className="flex flex-col items-start gap-6">
+                <p className="text-lead leading-[1.68] tracking-[-0.01em] text-ink-2">
+                  {footerCta.lead}
+                </p>
+                <Button href={footerCta.cta.href}>{footerCta.cta.label}</Button>
+              </Reveal>
+            </div>
 
-        <hr className="border-line" />
+            <hr className="border-line" />
+          </>
+        ) : null}
 
-        <footer className="grid grid-cols-2 gap-x-8 gap-y-10 py-12 md:grid-cols-4">
+        {/* Без призыва сверху исчезает и разделяющая его линейка, поэтому
+            подвал в этом случае несёт её сам. */}
+        <footer
+          className={`grid grid-cols-2 gap-x-8 gap-y-10 py-12 md:grid-cols-4 ${
+            cta ? "" : "border-t border-line"
+          }`}
+        >
           <div className="col-span-2 flex flex-col gap-5 md:col-span-1">
             <Logo />
             <p className="max-w-[22rem] text-sm leading-[1.6] text-muted">

@@ -7,76 +7,25 @@ import {
   SectionTitle,
 } from "@/components/ui";
 import { FileCheck, Layers, ShieldCheck } from "lucide-react";
-import { Reveal, Spotlight, SplitTitle, Stagger } from "@/components/motion";
+import { Reveal, Spotlight, Stagger } from "@/components/motion";
 import { ServiceArt } from "@/components/ServiceArt";
 import { typo } from "@/lib/typo";
-import { audiences, faq, process, proof, security, statement } from "@/content/site";
+import { audiences, faq, process, proof, security } from "@/content/site";
 
 /** Иконки блока безопасности — по порядку пунктов в content/site.ts. */
 const SECURITY_ICONS = [ShieldCheck, Layers, FileCheck] as const;
 
-/**
- * Section 5 of the reference: the tint band.
+/*
+ * Здесь стоял раздел с цитатой основателя — светлая полоса с репликой в
+ * четыре строки, кругом с инициалами, именем и должностью.
  *
- * Geometry from SECTION_MAP.md (репозиторий aura): a 900px figure, a light-weight
- * quote at 1.375rem with -1px tracking and gradient on the emphasised runs,
- * then avatar, name at 1.25rem/500 and role beneath.
- *
- * The reference carries a client testimonial. HRQT has none it may publish,
- * so this is the founder's own statement of approach (Фаза 7, «Наш подход»),
- * attributed to him by name.
- *
- * Цитата — единственное место на странице, где движение по словам работает не
- * на заголовок, а на текст: короткая реплика в четыре строки собирается так
- * же, как заголовки разделов, и читается как произнесённая, а не набранная.
+ * Он снят по прямому требованию заказчика, и требование обоснованное. Именная
+ * цитата на лендинге работает как отзыв: читатель ждёт от неё подтверждения
+ * со стороны. Здесь же компания цитировала собственного основателя — то есть
+ * подтверждала себя сама, занимая под это целый экран между услугами и
+ * командой. Место такому тексту — страница «О компании», где он читается как
+ * позиция, а не как доказательство.
  */
-export function Statement() {
-  return (
-    <Section tone="soft">
-      <figure className="relative mx-auto flex w-full max-w-[900px] flex-col justify-center gap-8">
-        <blockquote className="quote-text grow text-left xl:text-center">
-          <SplitTitle
-            as="p"
-            lead={statement.leadIn}
-            accent={statement.accent1}
-            className="text-[1.0625rem] leading-[1.55] font-light tracking-[-0.02em] md:text-[1.375rem] md:leading-[1.5]"
-          />
-          <SplitTitle
-            as="p"
-            lead={statement.middle}
-            accent={statement.accent2}
-            tail={statement.tail}
-            className="text-[1.0625rem] leading-[1.55] font-light tracking-[-0.02em] md:text-[1.375rem] md:leading-[1.5]"
-          />
-        </blockquote>
-
-        <Reveal
-          as="figcaption"
-          variant="rise"
-          delay={160}
-          className="flex flex-row leading-8 font-medium xl:justify-center"
-        >
-          {/* Место под фотографию основателя. Заменить на <Image> — круг и
-              размер уже заданы, менять больше ничего не нужно. */}
-          <span
-            aria-hidden
-            className="mr-4 flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent-soft text-lg font-bold text-accent-strong"
-          >
-            КЭ
-          </span>
-          <div>
-            <span className="block text-base leading-[26px] font-medium tracking-[-0.19px] xl:text-xl xl:leading-8">
-              {statement.author}
-            </span>
-            <span className="block text-sm font-normal tracking-[-0.02em] text-muted xl:text-base">
-              {statement.role}
-            </span>
-          </div>
-        </Reveal>
-      </figure>
-    </Section>
-  );
-}
 
 /**
  * Section 6 of the reference: the audience card grid.

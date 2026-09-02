@@ -254,9 +254,14 @@ function RoleIt() {
       <rect x="52" y="48" width="70" height="34" rx="8" fill={soft} />
       <rect x="198" y="48" width="70" height="34" rx="8" fill={soft} />
       <rect x="125" y="102" width="70" height="34" rx="8" fill="#fff" stroke={line} />
-      <path d="M122 65 H198" stroke={accent} strokeWidth="1.5" strokeDasharray="4 4" />
-      <path d="M87 82 V102 H125" stroke={accent} strokeWidth="1.5" />
-      <path d="M233 82 V102 H195" stroke={accent} strokeWidth="1.5" />
+      <path d="M122 65 H198" fill="none" stroke={accent} strokeWidth="1.5" strokeDasharray="4 4" />
+      {/* fill="none" здесь обязателен. У <path> заливка по умолчанию чёрная, а
+          эти два пути — уголки из вертикального и горизонтального отрезка:
+          SVG мысленно замыкает их прямой от конца к началу и красит
+          получившийся треугольник. Именно поэтому в карточке «ИТ и
+          безопасности» посреди схемы висели два чёрных клина. */}
+      <path d="M87 82 V102 H125" fill="none" stroke={accent} strokeWidth="1.5" />
+      <path d="M233 82 V102 H195" fill="none" stroke={accent} strokeWidth="1.5" />
       <g transform="translate(148 108)">
         <rect x="0" y="8" width="24" height="18" rx="4" fill={accent} />
         <path d="M6 8 V5 a6 6 0 0 1 12 0 V8" fill="none" stroke={accent} strokeWidth="2.5" />
@@ -281,14 +286,30 @@ function RoleBiz() {
           fill={i === 3 ? accent : soft}
         />
       ))}
+      {/* Линия роста и её наконечник.
+          Наконечник был нарисован как «M244 40 h18 v18» — уголок из
+          горизонтального и вертикального отрезка, приклеенный к концу линии.
+          Уголок смотрит вправо-вниз, линия приходит вправо-вверх: стрелка
+          указывала не туда, куда шла, и читалась как излом. Теперь это две
+          короткие черты, симметричные направлению последнего сегмента
+          (216,52 → 258,38), — обычный наконечник, который продолжает линию,
+          а не спорит с ней. */}
       <path
-        d="M60 112 L112 92 L164 78 L216 52 L260 40"
+        d="M60 112 L112 92 L164 78 L216 52 L258 38"
         fill="none"
         stroke={accent}
         strokeWidth="2.5"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <path d="M244 40 h18 v18" fill="none" stroke={accent} strokeWidth="2.5" strokeLinecap="round" />
+      <path
+        d="M240 34 L258 38 L246 52"
+        fill="none"
+        stroke={accent}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </Frame>
   );
 }

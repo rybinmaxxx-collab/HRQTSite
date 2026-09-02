@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { DemoBadge, PageHero } from "@/components/PageShell";
 import { Counter, Reveal, Spotlight, Stagger } from "@/components/motion";
 import { Button, Section, SectionTitle } from "@/components/ui";
+import { Proof } from "@/components/sections";
 import { DEMO_NOTICE, aboutPage } from "@/content/pages";
 
 export const metadata: Metadata = {
@@ -84,6 +85,12 @@ export default function AboutPage() {
           ))}
         </Stagger>
       </Section>
+
+      {/* Раздел приехал с главной. Там он объяснял метод тому, кто ещё не
+          решил, интересна ли ему компания вообще, и дублировал соседний блок
+          про закрытый контур. Здесь он попадает к читателю, который уже
+          спрашивает «как именно вы работаете». */}
+      <Proof />
 
       <Section>
         <SectionTitle lead="Кто это делает" className="mb-10 max-w-[40rem]" />
