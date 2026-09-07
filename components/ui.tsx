@@ -15,8 +15,10 @@ const TONE = {
   soft: "bg-soft",
   /* the tint band that stands in for elevation, HRQT --accent-s */
   tint: "bg-accent-soft",
-  /* the dark section HRQT's spec reserves for security/control blocks */
-  ink: "bg-ink text-white",
+  /* Секция, которую спека отводит под безопасность и контроль. На чёрной
+     странице «темнее фона» уже некуда, поэтому панель наоборот чуть светлее
+     — иначе её просто не видно. */
+  ink: "bg-panel text-white",
 } as const;
 
 /**

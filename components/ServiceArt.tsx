@@ -33,18 +33,22 @@ const ink = "var(--color-ink)";
 const accent = "var(--color-accent)";
 const soft = "var(--color-accent-soft)";
 const line = "var(--color-line)";
+/* Тело панели в мокапе. Раньше здесь стоял литеральный #fff — на тёмной
+   карточке он бил в глаза белым прямоугольником. Теперь это токен, и
+   иллюстрации перекрашиваются вместе с остальным сайтом. */
+const plate = "var(--color-panel)";
 
 /** Портал: шапка, боковое меню, плитки сервисов. */
 function Portal() {
   return (
     <Frame>
-      <rect x="24" y="20" width="272" height="136" rx="10" fill="#fff" stroke={line} />
-      <rect x="24" y="20" width="272" height="22" rx="10" fill={soft} />
+      <rect x="24" y="20" width="272" height="136" fill={plate} stroke={line} />
+      <rect x="24" y="20" width="272" height="22" fill={soft} />
       <circle cx="38" cy="31" r="3.5" fill={accent} />
-      <rect x="50" y="28" width="46" height="6" rx="3" fill={accent} opacity="0.55" />
-      <rect x="34" y="54" width="62" height="90" rx="7" fill={soft} />
+      <rect x="50" y="28" width="46" height="6" fill={accent} opacity="0.55" />
+      <rect x="34" y="54" width="62" height="90" fill={soft} />
       {[0, 1, 2, 3].map((i) => (
-        <rect key={i} x="42" y={64 + i * 18} width="46" height="6" rx="3" fill={accent} opacity="0.4" />
+        <rect key={i} x="42" y={64 + i * 18} width="46" height="6" fill={accent} opacity="0.4" />
       ))}
       {[0, 1, 2, 3].map((i) => (
         <rect
@@ -53,15 +57,14 @@ function Portal() {
           y={54 + Math.floor(i / 2) * 46}
           width="76"
           height="38"
-          rx="7"
-          fill="#fff"
+          fill={plate}
           stroke={line}
         />
       ))}
-      <rect x="118" y="64" width="30" height="5" rx="2.5" fill={ink} opacity="0.65" />
-      <rect x="206" y="64" width="38" height="5" rx="2.5" fill={ink} opacity="0.65" />
-      <rect x="118" y="110" width="42" height="5" rx="2.5" fill={ink} opacity="0.65" />
-      <rect x="206" y="110" width="26" height="5" rx="2.5" fill={ink} opacity="0.65" />
+      <rect x="118" y="64" width="30" height="5" fill={ink} opacity="0.65" />
+      <rect x="206" y="64" width="38" height="5" fill={ink} opacity="0.65" />
+      <rect x="118" y="110" width="42" height="5" fill={ink} opacity="0.65" />
+      <rect x="206" y="110" width="26" height="5" fill={ink} opacity="0.65" />
     </Frame>
   );
 }
@@ -70,19 +73,19 @@ function Portal() {
 function Integration() {
   return (
     <Frame>
-      <rect x="26" y="52" width="84" height="72" rx="10" fill="#fff" stroke={line} />
-      <rect x="210" y="52" width="84" height="72" rx="10" fill="#fff" stroke={line} />
-      <rect x="38" y="66" width="48" height="6" rx="3" fill={ink} opacity="0.6" />
-      <rect x="38" y="80" width="34" height="5" rx="2.5" fill={ink} opacity="0.3" />
-      <rect x="38" y="92" width="42" height="5" rx="2.5" fill={ink} opacity="0.3" />
-      <rect x="222" y="66" width="48" height="6" rx="3" fill={ink} opacity="0.6" />
-      <rect x="222" y="80" width="38" height="5" rx="2.5" fill={ink} opacity="0.3" />
-      <rect x="222" y="92" width="30" height="5" rx="2.5" fill={ink} opacity="0.3" />
+      <rect x="26" y="52" width="84" height="72" fill={plate} stroke={line} />
+      <rect x="210" y="52" width="84" height="72" fill={plate} stroke={line} />
+      <rect x="38" y="66" width="48" height="6" fill={ink} opacity="0.6" />
+      <rect x="38" y="80" width="34" height="5" fill={ink} opacity="0.3" />
+      <rect x="38" y="92" width="42" height="5" fill={ink} opacity="0.3" />
+      <rect x="222" y="66" width="48" height="6" fill={ink} opacity="0.6" />
+      <rect x="222" y="80" width="38" height="5" fill={ink} opacity="0.3" />
+      <rect x="222" y="92" width="30" height="5" fill={ink} opacity="0.3" />
       <path d="M112 76 H208" stroke={accent} strokeWidth="2" strokeDasharray="5 5" />
       <path d="M208 100 H112" stroke={accent} strokeWidth="2" strokeDasharray="5 5" />
       <path d="M200 70 l8 6 -8 6" fill="none" stroke={accent} strokeWidth="2" />
       <path d="M120 94 l-8 6 8 6" fill="none" stroke={accent} strokeWidth="2" />
-      <rect x="140" y="20" width="40" height="20" rx="10" fill={soft} />
+      <rect x="140" y="20" width="40" height="20" fill={soft} />
       <circle cx="160" cy="30" r="4" fill={accent} />
     </Frame>
   );
@@ -92,12 +95,12 @@ function Integration() {
 function Agent() {
   return (
     <Frame>
-      <rect x="30" y="24" width="260" height="128" rx="12" fill="none" stroke={accent} strokeDasharray="7 6" />
-      <rect x="120" y="60" width="80" height="56" rx="10" fill={soft} />
+      <rect x="30" y="24" width="260" height="128" fill="none" stroke={accent} strokeDasharray="7 6" />
+      <rect x="120" y="60" width="80" height="56" fill={soft} />
       <circle cx="160" cy="80" r="9" fill={accent} />
-      <rect x="136" y="98" width="48" height="6" rx="3" fill={accent} opacity="0.5" />
+      <rect x="136" y="98" width="48" height="6" fill={accent} opacity="0.5" />
       {[62, 160, 258].map((x, i) => (
-        <rect key={i} x={x - 22} y={126} width="44" height="14" rx="7" fill="#fff" stroke={line} />
+        <rect key={i} x={x - 22} y={126} width="44" height="14" fill={plate} stroke={line} />
       ))}
       <path d="M120 88 H70" stroke={accent} strokeWidth="2" />
       <path d="M200 88 H250" stroke={accent} strokeWidth="2" />
@@ -118,13 +121,12 @@ function Audit() {
           y={34 + i * 38}
           width="240"
           height="28"
-          rx="8"
-          fill={i === 1 ? soft : "#fff"}
+          fill={i === 1 ? soft : plate}
           stroke={line}
         />
       ))}
       {[0, 1, 2].map((i) => (
-        <rect key={i} x="54" y={44 + i * 38} width={110 - i * 24} height="7" rx="3.5" fill={ink} opacity="0.55" />
+        <rect key={i} x="54" y={44 + i * 38} width={110 - i * 24} height="7" fill={ink} opacity="0.55" />
       ))}
       {[0, 1, 2].map((i) => (
         <g key={i} transform={`translate(246 ${41 + i * 38})`}>
@@ -140,9 +142,9 @@ function Audit() {
 function Security() {
   return (
     <Frame>
-      <rect x="32" y="34" width="120" height="108" rx="10" fill="#fff" stroke={line} />
+      <rect x="32" y="34" width="120" height="108" fill={plate} stroke={line} />
       {[0, 1, 2, 3].map((i) => (
-        <rect key={i} x="46" y={50 + i * 22} width={92 - (i % 2) * 26} height="7" rx="3.5" fill={ink} opacity="0.3" />
+        <rect key={i} x="46" y={50 + i * 22} width={92 - (i % 2) * 26} height="7" fill={ink} opacity="0.3" />
       ))}
       <path
         d="M228 34 l52 20 v34 c0 26 -22 42 -52 54 c-30 -12 -52 -28 -52 -54 V54 z"
@@ -160,14 +162,14 @@ function Security() {
 function Dashboard() {
   return (
     <Frame>
-      <rect x="24" y="20" width="272" height="136" rx="10" fill="#fff" stroke={line} />
+      <rect x="24" y="20" width="272" height="136" fill={plate} stroke={line} />
       {[0, 1, 2].map((i) => (
-        <rect key={i} x={40 + i * 88} y="36" width="72" height="34" rx="7" fill={soft} />
+        <rect key={i} x={40 + i * 88} y="36" width="72" height="34" fill={soft} />
       ))}
       {[0, 1, 2].map((i) => (
-        <rect key={i} x={50 + i * 88} y="46" width="34" height="8" rx="4" fill={accent} opacity="0.7" />
+        <rect key={i} x={50 + i * 88} y="46" width="34" height="8" fill={accent} opacity="0.7" />
       ))}
-      <rect x="40" y="84" width="240" height="56" rx="8" fill="#fff" stroke={line} />
+      <rect x="40" y="84" width="240" height="56" fill={plate} stroke={line} />
       <path
         d="M54 126 L92 106 L130 116 L168 92 L206 100 L244 78 L266 86"
         fill="none"
@@ -187,16 +189,16 @@ function Dashboard() {
 function Career() {
   return (
     <Frame>
-      <rect x="24" y="20" width="272" height="136" rx="10" fill="#fff" stroke={line} />
-      <rect x="24" y="20" width="272" height="48" rx="10" fill={soft} />
-      <rect x="42" y="36" width="104" height="8" rx="4" fill={accent} opacity="0.7" />
-      <rect x="42" y="50" width="62" height="6" rx="3" fill={ink} opacity="0.3" />
-      <rect x="228" y="38" width="50" height="18" rx="9" fill={accent} />
+      <rect x="24" y="20" width="272" height="136" fill={plate} stroke={line} />
+      <rect x="24" y="20" width="272" height="48" fill={soft} />
+      <rect x="42" y="36" width="104" height="8" fill={accent} opacity="0.7" />
+      <rect x="42" y="50" width="62" height="6" fill={ink} opacity="0.3" />
+      <rect x="228" y="38" width="50" height="18" fill={accent} />
       {[0, 1, 2].map((i) => (
-        <rect key={i} x="42" y={82 + i * 24} width="236" height="18" rx="6" fill="#fff" stroke={line} />
+        <rect key={i} x="42" y={82 + i * 24} width="236" height="18" fill={plate} stroke={line} />
       ))}
       {[0, 1, 2].map((i) => (
-        <rect key={i} x="54" y={88 + i * 24} width={112 - i * 22} height="6" rx="3" fill={ink} opacity="0.45" />
+        <rect key={i} x="54" y={88 + i * 24} width={112 - i * 22} height="6" fill={ink} opacity="0.45" />
       ))}
       {[0, 1, 2].map((i) => (
         <circle key={i} cx="264" cy={91 + i * 24} r="4" fill={accent} opacity="0.5" />
@@ -219,8 +221,8 @@ function Services() {
       ].map(([x, y], i) => (
         <g key={i}>
           <path d={`M160 88 L${x} ${y}`} stroke={accent} strokeWidth="1.5" opacity="0.45" />
-          <rect x={x - 34} y={y - 15} width="68" height="30" rx="8" fill="#fff" stroke={line} />
-          <rect x={x - 22} y={y - 3} width="44" height="6" rx="3" fill={ink} opacity="0.45" />
+          <rect x={x - 34} y={y - 15} width="68" height="30" fill={plate} stroke={line} />
+          <rect x={x - 22} y={y - 3} width="44" height="6" fill={ink} opacity="0.45" />
         </g>
       ))}
     </Frame>
@@ -231,14 +233,14 @@ function Services() {
 function RoleHr() {
   return (
     <Frame>
-      <rect x="36" y="34" width="248" height="108" rx="10" fill="#fff" stroke={line} />
+      <rect x="36" y="34" width="248" height="108" fill={plate} stroke={line} />
       {[0, 1, 2].map((i) => (
         <g key={i} transform={`translate(${58 + i * 84} 58)`}>
           <circle cx="18" cy="14" r="11" fill={soft} />
           <circle cx="18" cy="11" r="5" fill={accent} />
           <path d="M8 22 a10 8 0 0 1 20 0" fill={accent} opacity="0.4" />
-          <rect x="0" y="34" width="36" height="6" rx="3" fill={ink} opacity="0.4" />
-          <rect x="6" y="46" width="24" height="5" rx="2.5" fill={ink} opacity="0.22" />
+          <rect x="0" y="34" width="36" height="6" fill={ink} opacity="0.4" />
+          <rect x="6" y="46" width="24" height="5" fill={ink} opacity="0.22" />
         </g>
       ))}
       <path d="M94 72 H136 M178 72 H220" stroke={accent} strokeWidth="1.5" strokeDasharray="4 4" />
@@ -250,10 +252,10 @@ function RoleHr() {
 function RoleIt() {
   return (
     <Frame>
-      <rect x="34" y="30" width="252" height="116" rx="10" fill="none" stroke={line} />
-      <rect x="52" y="48" width="70" height="34" rx="8" fill={soft} />
-      <rect x="198" y="48" width="70" height="34" rx="8" fill={soft} />
-      <rect x="125" y="102" width="70" height="34" rx="8" fill="#fff" stroke={line} />
+      <rect x="34" y="30" width="252" height="116" fill="none" stroke={line} />
+      <rect x="52" y="48" width="70" height="34" fill={soft} />
+      <rect x="198" y="48" width="70" height="34" fill={soft} />
+      <rect x="125" y="102" width="70" height="34" fill={plate} stroke={line} />
       <path d="M122 65 H198" fill="none" stroke={accent} strokeWidth="1.5" strokeDasharray="4 4" />
       {/* fill="none" здесь обязателен. У <path> заливка по умолчанию чёрная, а
           эти два пути — уголки из вертикального и горизонтального отрезка:
@@ -263,7 +265,7 @@ function RoleIt() {
       <path d="M87 82 V102 H125" fill="none" stroke={accent} strokeWidth="1.5" />
       <path d="M233 82 V102 H195" fill="none" stroke={accent} strokeWidth="1.5" />
       <g transform="translate(148 108)">
-        <rect x="0" y="8" width="24" height="18" rx="4" fill={accent} />
+        <rect x="0" y="8" width="24" height="18" fill={accent} />
         <path d="M6 8 V5 a6 6 0 0 1 12 0 V8" fill="none" stroke={accent} strokeWidth="2.5" />
       </g>
     </Frame>
@@ -274,7 +276,7 @@ function RoleIt() {
 function RoleBiz() {
   return (
     <Frame>
-      <rect x="36" y="30" width="248" height="116" rx="10" fill="#fff" stroke={line} />
+      <rect x="36" y="30" width="248" height="116" fill={plate} stroke={line} />
       {[0, 1, 2, 3].map((i) => (
         <rect
           key={i}
@@ -282,7 +284,6 @@ function RoleBiz() {
           y={122 - (i + 1) * 18}
           width="34"
           height={(i + 1) * 18}
-          rx="6"
           fill={i === 3 ? accent : soft}
         />
       ))}

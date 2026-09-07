@@ -86,8 +86,10 @@ export function Header() {
   return (
     <header
       data-hidden={hidden}
-      className={`m-header fixed top-0 z-[9000] w-full bg-surface ${
-        scrolled ? "border-b border-line" : "border-b border-transparent"
+      className={`m-header fixed top-0 z-[9000] w-full transition-colors duration-300 ${
+        scrolled
+          ? "border-b border-line bg-surface/90 backdrop-blur-md"
+          : "border-b border-transparent bg-transparent"
       }`}
       onMouseLeave={() => setOpen(null)}
     >

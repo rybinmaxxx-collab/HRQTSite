@@ -32,24 +32,32 @@
  * Additions beyond both are marked EXTENSION.
  */
 @theme {
-  /* ---- HRQT palette (Фаза 6, verbatim) ------------------------------ */
-  --color-ink: #14181f; /* headings, dark sections, logo */
-  --color-ink-2: #3a4250; /* body copy */
-  --color-muted: #6b7280; /* captions, meta */
-  --color-line: #e6e9ef; /* borders, dividers */
-  --color-surface: #ffffff;
-  --color-soft: #f5f8fc; /* alternating section band */
-  --color-accent: #2f6bed; /* fills only: buttons, chips, icons */
-  --color-accent-strong: #1e4fd8; /* hover, and any accent-coloured text */
-  --color-accent-soft: #eaf1fe; /* icon grounds, badges, tint band */
+  /* ---- Палитра: тёмная сцена ----------------------------------------
+     Сайт переведён на визуальный шаблон «закрытый контур»: чёрная сцена,
+     красный акцент, острые углы. Роли токенов не менялись — поменялись
+     значения, поэтому перекрасился весь сайт разом, а не отдельные экраны.
 
-  /* EXTENSION — one derived stop so the gradient below has somewhere to
-     travel. Stays in the brand's blue-violet family; drop it back to
-     --color-accent-strong for a monochrome device. */
-  --color-accent-far: #5b33c9;
+     Красный: #c81b1c — заливки (кнопки, чипы, иконки). Мелкий текст этим
+     цветом на чёрном даёт около 3.4:1 и нормы не берёт, поэтому любой
+     акцентный ТЕКСТ красится в --color-accent-strong (#ef4b4c, ≈5.2:1). */
+  --color-ink: #ffffff; /* заголовки и основной текст */
+  --color-ink-2: #b7bcc4; /* тело текста */
+  --color-muted: #8a9098; /* подписи, мета */
+  --color-line: #23262c; /* границы, разделители */
+  --color-surface: #000000; /* фон страницы */
+  --color-soft: #0a0b0d; /* чередующаяся полоса */
+  --color-accent: #c81b1c; /* только заливки */
+  --color-accent-strong: #ef4b4c; /* ховер и любой акцентный текст */
+  --color-accent-soft: #1c0d0e; /* подложки иконок, бейджи, полоса-тинт */
 
-  /* EXTENSION — dark-section text, from the Фаза 6 note "текст белый/#c2c9d6" */
-  --color-on-ink: #c2c9d6;
+  /* Дальний стоп градиента. Остаётся в красном семействе. */
+  --color-accent-far: #ff8a6b;
+
+  /* Подложка тёмных панелей: на чёрной странице секция «темнее фона» уже не
+     работает, поэтому она, наоборот, чуть светлее — иначе её не видно. */
+  --color-panel: #0e1013;
+
+  --color-on-ink: #b7bcc4;
 
   /* ---- Layout and rhythm (Beamery) ---------------------------------- */
   /* HRQT's spec says 1160px/24px; Beamery's 76rem with a percentage gutter
@@ -83,12 +91,17 @@
      geometric grotesk with a full Cyrillic set; Inter is HRQT's own spec. */
   --font-display: var(--font-onest), "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Моноширинный — надстрочники, подписи, навигация, цифры. Он и даёт
+     шаблону его техничный тон; кириллица у JetBrains Mono своя. */
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --text-xl: 1.1875rem; /* overridden as in the original */
 
   /* ---- Shape -------------------------------------------------------- */
-  --radius-card: 12px; /* HRQT --r, and Beamery's --border-radius-lg. Both agree. */
-  --radius-pill: 24px; /* Beamery. HRQT's spec says 8px; craft wins here. */
+  /* Шаблон не знает скруглений вовсе: ни у карточек, ни у кнопок, ни у
+     чипов. Обе величины обнулены здесь, а не вычищены по разметке. */
+  --radius-card: 0px;
+  --radius-pill: 0px;
 
   /* ---- Motion ------------------------------------------------------- */
   --animation-delay-base: 0.15s;
@@ -123,8 +136,8 @@ h3 > strong,
 .quote-text p > strong {
   background-image: linear-gradient(
     265deg,
-    var(--color-accent) 0,
-    var(--color-accent-strong) 55%,
+    var(--color-accent-strong) 0,
+    #ff6a5c 55%,
     var(--color-accent-far) 100%
   );
   background-clip: text;
@@ -136,15 +149,17 @@ h3 > strong,
 }
 
 /*
- * The glow behind hero and closing CTA. Beamery serves this as a .webp
- * raster; two radial gradients reproduce it in the HRQT palette without
- * shipping anyone's asset.
+ * Подложка под героем и закрывающим CTA.
+ *
+ * Раньше здесь последним слоем стоял непрозрачный --color-surface. Теперь под
+ * страницей лежит сцена (components/Stage.tsx), и сплошная заливка её бы
+ * закрыла — остались только два красных подсвета поверх сцены. Ниже первого
+ * экрана сцены нет, и прозрачность там означает просто чёрный фон body.
  */
 .brand-glow {
   background:
-    radial-gradient(58% 52% at 88% 2%, var(--color-accent-soft) 0%, transparent 66%),
-    radial-gradient(44% 46% at 6% 92%, var(--color-soft) 0%, transparent 70%),
-    var(--color-surface);
+    radial-gradient(58% 52% at 88% 2%, rgba(200, 27, 28, 0.16) 0%, transparent 66%),
+    radial-gradient(44% 46% at 6% 92%, rgba(200, 27, 28, 0.07) 0%, transparent 70%);
 }
 
 /*
@@ -193,7 +208,7 @@ h3 > strong,
   position: absolute;
   inset: -3px -0.75rem;
   z-index: -1;
-  border-radius: 1rem;
+  border-radius: 0;
   background: var(--color-accent-soft);
   opacity: 0;
   transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -311,8 +326,8 @@ html.js-motion .m-stagger > *:nth-child(n + 8) { --mi: 7; }
 .m-word-accent {
   background-image: linear-gradient(
     265deg,
-    var(--color-accent) 0,
-    var(--color-accent-strong) 55%,
+    var(--color-accent-strong) 0,
+    #ff6a5c 55%,
     var(--color-accent-far) 100%
   );
   background-clip: text;
@@ -320,12 +335,11 @@ html.js-motion .m-stagger > *:nth-child(n + 8) { --mi: 7; }
   -webkit-text-fill-color: transparent;
 }
 
-/* Тот же градиент на тёмной секции недобирает по контрасту: #2f6bed на
-   #14181f даёт около 2.5:1 при норме 3:1 для крупного текста. На чернильном
-   фоне акцент берёт два осветлённых стопа того же семейства — цвет узнаётся,
-   заголовок читается. */
+/* Страница целиком тёмная, поэтому отдельный «светлый на чернильном»
+   вариант акцента больше не нужен: базовый градиент и так рассчитан на
+   чёрный фон. Селектор оставлен, чтобы разметка с .m-on-ink не ломалась. */
 .m-on-ink .m-word-accent {
-  background-image: linear-gradient(265deg, #7ea6ff 0, #9db4ff 55%, #b39dff 100%);
+  background-image: linear-gradient(265deg, var(--color-accent-strong) 0, #ff6a5c 55%, var(--color-accent-far) 100%);
 }
 
 /* Соединяющая линия шагов процесса. Только с lg, где шаги стоят в ряд:

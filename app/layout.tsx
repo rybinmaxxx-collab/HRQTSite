@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, Onest } from "next/font/google";
+import { Inter, JetBrains_Mono, Onest } from "next/font/google";
 import { Header } from "@/components/Header";
+import { Stage } from "@/components/Stage";
 import { brand } from "@/content/site";
 import "./globals.css";
 
@@ -19,6 +20,15 @@ const inter = Inter({
   subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+/* Моноширинный для надстрочников, подписей и цифр — техничный тон шаблона.
+   Кириллица у JetBrains Mono своя, подмены не нужно. */
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "500"],
+  variable: "--font-jetbrains",
   display: "swap",
 });
 
@@ -49,7 +59,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru" className={`${onest.variable} ${inter.variable}`}>
+    <html lang="ru" className={`${onest.variable} ${inter.variable} ${jetbrains.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: MOTION_BOOT }} />
       </head>
@@ -57,8 +67,9 @@ export default function RootLayout({
         <a href="#main" className="skip-link">
           К содержимому
         </a>
+        <Stage />
         <Header />
-        <main id="main" className="flex-1">
+        <main id="main" className="relative z-[1] flex-1">
           {children}
         </main>
       </body>
